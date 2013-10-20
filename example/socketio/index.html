@@ -21,18 +21,18 @@
         document.getElementById('chat').scrollTop = 1000000;
       }
 
-      var conn = io.connect('http://localhost:8080');
+      var socket = io.connect('http://localhost:8080');
 
       function send(){
         var val = document.getElementById('text').value;
-        conn.send(val);
+        socket.send(val);
       }
 
       function esc(msg){
         return msg.replace(/</g, '&lt;').replace(/>/g, '&gt;');
       };
 
-      conn.on('message', function(obj){
+      socket.on('tw-client', function(obj){
         message(obj);
       });
     </script>
