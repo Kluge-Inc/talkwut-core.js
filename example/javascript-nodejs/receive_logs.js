@@ -3,11 +3,11 @@ var amqp = require('amqp');
 var connection = amqp.createConnection({host: 'localhost'});
 
 connection.on('ready', function(){
-    connection.exchange('logs', {type: 'fanout',
+    connection.exchange('talkwut-global', {type: 'fanout',
                                  autoDelete: false}, function(exchange){
-        connection.queue('tmp-' + Math.random(), {exclusive: true},
+        connection.queue('tw-server-' + Math.random(), {exclusive: true},
                          function(queue){
-            queue.bind('logs', '');
+            queue.bind('talkwut-global', '');
             console.log(' [*] Waiting for logs. To exit press CTRL+C')
 
             queue.subscribe(function(msg){
