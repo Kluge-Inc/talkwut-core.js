@@ -41,7 +41,7 @@ var Notificator = builder.build();
 
 // Configuration params
 var
-    amqpHost = 'localhost',
+    amqpHost = '192.168.9.118',
     twIncomingQueue = 'talkwut-global',
     twUserRegistrationQueue = 'talkwut-register'
 

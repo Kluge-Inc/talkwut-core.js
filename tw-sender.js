@@ -19,7 +19,7 @@ var builder = ProtoBuf.protoFromFile("talkwut-protocol/notifier/protocol.proto")
 
 // Configuration params
 var
-    amqpHost = 'localhost',
+    amqpHost = '192.168.9.118',
     twIncomingQueue = 'talkwut-global'
 
 // Open amqp connection

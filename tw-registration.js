@@ -17,7 +17,7 @@ var TalkwutCoreProtocol = ProtoBuf.protoFromFile("talkwut-protocol/core/protocol
 
 // Configuration params
 var
-    amqpHost = 'localhost',
+    amqpHost = '192.168.9.118',
     twIncomingQueue = 'talkwut-global',
     twUserRegistrationQueue = 'talkwut-register'
 
