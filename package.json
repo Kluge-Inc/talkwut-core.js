@@ -1,7 +1,8 @@
 {
-  "name": "talkwut-core",
-  "version": "0.1",
-  "dependencies": {
-    "socket.io": ">=0.8"
-  }
+    "name": "talkwut-core",
+    "version": "0.1.0",
+    "dependencies": {
+        "socket.io": ">=0.8",
+        "amqp": ">=0.1.7"
+    }
 }

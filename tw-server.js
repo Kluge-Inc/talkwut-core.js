@@ -17,6 +17,7 @@
 #+  October 2013                                                   #
 #                                                                  #
 #   Script usage:                                                  #
+#   > npm install                                                  #
 #   > node tw-server.js                                            #
 #                                                                  #
 #   Changelog:                                                     #
