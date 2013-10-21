@@ -31,9 +31,7 @@ var
     url = require('url'),
     fs = require('fs'),
     io = require('socket.io'),
-    amqp = require('amqp'),
-    util = require('util');
-;
+    amqp = require('amqp');
 
 var ProtoBuf = require("protobufjs");
 
@@ -41,18 +39,15 @@ var builder = ProtoBuf.protoFromFile("talkwut-protocol/notifier/protocol.proto")
 
 var Notificator = builder.build();
 
-var notification = new Notificator.Notification("bla", "lasdfds", "ufo");
-
-console.log(notification.toBuffer());
-
-
 // Configuration params
 var
     amqpHost = 'localhost',
-    twIncomingQueue = 'talkwut-global'
+    twIncomingQueue = 'talkwut-global',
+    twUserRegistrationQueue = 'talkwut-register'
 
 // Open amqp connection
 var connection = amqp.createConnection({host: amqpHost});
+
 
 connection.on('ready', function () {
 
@@ -66,12 +61,12 @@ connection.on('ready', function () {
         queue = connection.queue(servQueueName, {exclusive: true},
             function (queue) {
                 // Subscribe to global exchange
-                queue.bind(exchangeGlobal, '');
+                queue.bind(exchange, '');
                 console.log(' [*] Waiting for messages. To exit press CTRL+C')
                 console.log(' [*] Personal queue has been created for this server: %s', servQueueName)
                 queue.subscribe(function (msg) {
                         var email = Notificator.Email.decode(msg.data);
-                        console.log(" [x] Message received: %s", email.message.category);
+                        console.log(" [x] Message received: %s", email.mail[0]);
                 });
             });
     });
