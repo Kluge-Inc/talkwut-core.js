@@ -19,7 +19,7 @@ var builder = ProtoBuf.protoFromFile("talkwut-protocol/notifier/protocol.proto")
 
 // Configuration params
 var
-    amqpHost = '192.168.9.118',
+    amqpHost = 'localhost',
     twIncomingQueue = 'talkwut-global'
 
 // Open amqp connection
@@ -37,9 +37,7 @@ connection.on('ready', function(){
     });
 
     var Notificator = builder.build("talkwut.notifier");
+    var email = new Notificator.Email(['test@example.com'], new Notificator.Notification("Title", "Message body", "http://www.rabbitmq.com/amqp-0-9-1-reference.html"));
 
-    var notification = new Notificator.Notification("Антоша", "Вася привет", "http://www.rabbitmq.com/amqp-0-9-1-reference.html");
-    var email = new Notificator.Email(['asd@msad.ru'], new Notificator.Notification("алее", "lasdfds", "ufo"));
-
-    exchangeGlobal.publish('', notification.toBuffer());
+    exchangeGlobal.publish('', email.toBuffer());
 });
