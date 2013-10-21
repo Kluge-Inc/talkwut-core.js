@@ -36,12 +36,10 @@ connection.on('ready', function(){
 
     });
 
-    var Notificator = builder.build();
+    var Notificator = builder.build("talkwut.notifier");
 
-    var notification = new Notificator.Notification("алее", "lasdfds", "ufo");
+    var notification = new Notificator.Notification("Антоша", "Вася привет", "http://www.rabbitmq.com/amqp-0-9-1-reference.html");
     var email = new Notificator.Email(['asd@msad.ru'], new Notificator.Notification("алее", "lasdfds", "ufo"));
 
-    exchangeGlobal.publish('', email.toBuffer());
-
-
+    exchangeGlobal.publish('', notification.toBuffer());
 });

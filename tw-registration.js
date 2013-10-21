@@ -28,17 +28,20 @@ var connection = amqp.createConnection({host: amqpHost});
 connection.on('ready', function () {
     var queue;
 
-    queue = connection.queue(twUserRegistrationQueue, {durable: true},
-        function (queue) {
-            // Subscribe to global exchange
-            console.log(' [*] Waiting for messages. To exit press CTRL+C')
-            queue.subscribe(function (msg) {
-                var registration = TalkwutCoreProtocol.Registration.decode(msg.data);
+    exchangeGlobal = connection.exchange(twIncomingQueue, {type: 'fanout',
+        autoDelete: false}, function (exchange) {
+        queue = connection.queue(twUserRegistrationQueue, {durable: true},
+            function (queue) {
+                // Subscribe to global exchange
+                console.log(' [*] Waiting for messages. To exit press CTRL+C')
+                queue.subscribe(function (msg) {
+                    var registration = TalkwutCoreProtocol.Registration.decode(msg.data);
 
-                var userQueue = connection.queue(registration.queue);
-                userQueue.bind(twIncomingQueue);
+                    var userQueue = connection.queue(registration.queue);
+                    userQueue.bind(exchange, '');
 
-                console.log(" [x] Queue binded: %s", registration.queue);
+                    console.log(" [x] Queue binded: %s", registration.queue);
+                });
             });
-        });
+    });
 });

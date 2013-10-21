@@ -73,5 +73,4 @@ connection.on('ready', function () {
 
     helloMessage = 'Talkwut node connected: ' + servQueueName;
     exchangeGlobal.publish('', helloMessage);
-
 });
