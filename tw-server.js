@@ -33,20 +33,22 @@ var
   io = require('socket.io'),
   amqp = require('amqp');
 
+var ProtoBuf = require("protobufjs");
+
+var builder = ProtoBuf.protoFromFile("talkwut-protocol/notifier/protocol.proto");
+
+var Notificator = builder.build();
+
+var notification = new Notificator.Notification("bla", "lasdfds", "ufo");
+
+console.log(notification.toBuffer());
+
+
 
 // Configuration params
 var
   amqpHost = 'localhost',
-  twIncomingQueue = 'talkwut-global',
-  httpListenPort = 8080,
-  httpListenAddress = '0.0.0.0';
-
-
-// Fire up http server
-var httpServer = http.createServer(handler);
-
-// Open socket.io server
-var socketioServer = io.listen(httpServer);
+  twIncomingQueue = 'talkwut-global'
 
 // Open amqp connection
 var connection = amqp.createConnection({host: amqpHost});
@@ -72,7 +74,8 @@ connection.on('ready', function(){
                 console.log(" [x] Message received: %s", msg.data.toString('utf-8'));
 
                 // TODO: mailer hook goes here
-
+                var Notification = Notificator.Notification.decode(msg);
+                console.log(Notification.category);
             });
         })
     });
@@ -81,33 +84,3 @@ connection.on('ready', function(){
     exchangeGlobal.publish('', helloMessage);
 
 });
-
-
-// Start listening
-httpServer.listen(httpListenPort, httpListenAddress);
-
-// Here goes handler for the web server
-function handler(req, res) {
-  var path = url.parse(req.url).pathname;
-  console.log(' [w] Got http request: %s', path)
-  switch (path){
-  case '/':
-    path = '/index.html';
-  case '/index.html':
-    fs.readFile(__dirname + '/index.html', function(err, data){
-      if (err) return send404(res);
-      res.writeHead(200, {'Content-Type': 'text/html'});
-      res.write(data, 'utf8');
-      res.end();
-    });
-    break;
-  default: send404(res);
-  }
-}
-
-// Error handling
-function send404(res){
-  res.writeHead(404);
-  res.write('404');
-  res.end();
-}

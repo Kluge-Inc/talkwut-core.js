@@ -1,0 +1,3 @@
+[submodule "talkwut-protocol"]
+	path = talkwut-protocol
+	url = ../talkwut-protocol.git
