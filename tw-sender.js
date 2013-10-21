@@ -38,9 +38,10 @@ connection.on('ready', function(){
 
     var Notificator = builder.build();
 
-    var notification = new Notificator.Notification("bla", "lasdfds", "ufo");
+    var notification = new Notificator.Notification("алее", "lasdfds", "ufo");
+    var email = new Notificator.Email(['asd@msad.ru'], new Notificator.Notification("алее", "lasdfds", "ufo"));
 
-    exchangeGlobal.publish('', notification.toBuffer());
+    exchangeGlobal.publish('', email.toBuffer());
 
 
 });
