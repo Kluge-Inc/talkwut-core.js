@@ -12,7 +12,7 @@ var
 var ProtoBuf = require("protobufjs");
 
 var Notificator = ProtoBuf.protoFromFile("talkwut-protocol/notifier/protocol.proto").build();
-var TalkwutCoreProtocol = ProtoBuf.protoFromFile("talkwut-protocol/core/protocol.proto");
+var TalkwutCoreProtocol = ProtoBuf.protoFromFile("talkwut-protocol/core/protocol.proto").build("talkwut.core");
 
 
 // Configuration params
@@ -35,10 +35,10 @@ connection.on('ready', function () {
             queue.subscribe(function (msg) {
                 var registration = TalkwutCoreProtocol.Registration.decode(msg.data);
 
-                userQueue =  connection.queue(registration.queue);
-                userQueue.bind(twIncomingQueue, '');
+                var userQueue = connection.queue(registration.queue);
+                userQueue.bind(twIncomingQueue);
 
-                console.log(" [x] Message received: %s", registration.queue);
+                console.log(" [x] Queue binded: %s", registration.queue);
             });
         });
 });
