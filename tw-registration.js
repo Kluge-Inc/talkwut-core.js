@@ -52,8 +52,8 @@ connection.on('ready', function () {
                                         userQueue.bind(categoryExchange, '');
                                         console.log(" [x] Category binded: %s for %s", category.name, registration.user);
                                     });
-                                })
-                            })
+                                });
+                            });
                     } catch (e) {
                         console.log(e.message);
                     }

@@ -27,7 +27,9 @@ var connection = amqp.createConnection({host: amqpHost});
 
 connection.on('ready', function(){
     var Notificator = builder.build("talkwut.notifier");
-    var email = new Notificator.Envelope(new Notificator.Notification("Title", "Message body", "http://www.rabbitmq.com/amqp-0-9-1-reference.html"), new Notificator.Envelope.Destination(['sd@asdw', '13wd@wdsad'],['ololo']));
+    var email = new Notificator.Envelope(
+        new Notificator.Notification("Title", "Message body", "http://www.rabbitmq.com/amqp-0-9-1-reference.html"),
+        new Notificator.Envelope.Destination(['sd@asdw', '13wd@wdsad'],['RTNRI']));
 
     connection.publish(twIncomingQueue, email.toBuffer());
 });
