@@ -12,7 +12,7 @@ var
 var ProtoBuf = require("protobufjs");
 
 var Notificator = ProtoBuf.protoFromFile("talkwut-protocol/notifier/protocol.proto").build();
-var TalkwutCoreProtocol = ProtoBuf.protoFromFile("talkwut-protocol/core/protocol.proto").build("talkwut.core");
+var TalkwutCoreProtocol = ProtoBuf.protoFromFile("talkwut-protocol/core/registration.proto").build("talkwut.core");
 
 
 // Configuration params

@@ -4,6 +4,7 @@
     "dependencies": {
         "socket.io": ">=0.8",
         "amqp": ">=0.1.7",
-        "protobufjs": ">=1.1.9"
+        "protobufjs": ">=1.1.9",
+        "mongoose": ">=3.7.4"
     }
 }
