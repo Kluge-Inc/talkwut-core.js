@@ -7,7 +7,8 @@
  */
 
 var
-    amqp = require('amqp');
+    amqp = require('amqp'),
+    model = require('./model.js');
 
 var ProtoBuf = require("protobufjs");
 
@@ -37,10 +38,25 @@ connection.on('ready', function () {
                 queue.subscribe(function (msg) {
                     var registration = TalkwutCoreProtocol.RegistrationRequest.decode(msg.data);
 
+
                     var userQueue = connection.queue(registration.queue);
                     userQueue.bind(exchange, '');
 
-                    console.log(" [x] Queue binded: %s", registration.queue);
+                    try {
+                        model.User.findOne({ 'name': registration.user}).
+                            populate('_categories').exec(function (err, user) {
+                                if (err) console.log(err);
+                                user._categories.forEach(function (category) {
+                                    connection.exchange(category.name, {type: 'fanout',
+                                        autoDelete: false}, function (categoryExchange) {
+                                        userQueue.bind(categoryExchange, '');
+                                        console.log(" [x] Category binded: %s for %s", category.name, registration.user);
+                                    });
+                                })
+                            })
+                    } catch (e) {
+                        console.log(e.message);
+                    }
                 });
             });
     });

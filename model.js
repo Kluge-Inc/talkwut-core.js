@@ -18,6 +18,7 @@ exports.Category = mongoose.model('Category', {
 });
 
 exports.User = mongoose.model('User', {
+    name: String,
     email: String,
     _categories: [
         { type: String, ref: 'Category' }

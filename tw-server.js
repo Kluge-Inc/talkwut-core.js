@@ -45,18 +45,7 @@ var
     amqpHost = '192.168.9.118',
     twIncomingQueue = 'talkwut-incoming'
 
-var rtnri = new model.Category({name: "RTnRI"});
-rtnri.save(function (err) {
-    if (err) {
-        console.log(err.message);
-    }
-    var user = new model.User({email: "sad@dw.ry", _categories: [rtnri.id]})
-    user.save(function (err) {
-        if (err) {
-            console.log(err.message);
-        }
-    })
-});
+
 
 
 // Open amqp connection
