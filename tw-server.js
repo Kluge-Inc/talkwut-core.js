@@ -33,7 +33,7 @@ var
     io = require('socket.io'),
     amqp = require('amqp'),
     ProtoBuf = require("protobufjs"),
-    mongoose = require('mongoose');
+    model = require("./model.js");
 
 
 var builder = ProtoBuf.protoFromFile("talkwut-protocol/notifier/protocol.proto");
@@ -45,41 +45,12 @@ var
     amqpHost = '192.168.9.118',
     twIncomingQueue = 'talkwut-incoming'
 
-mongoose.connect('mongodb://195.211.101.35/talkwut');
-var Schema = mongoose.Schema;
-var Category = mongoose.model('Category', {
-    name: String,
-    exchange: String,
-    users: [
-        { type: Schema.Types.ObjectId, ref: 'User ' }
-    ]
-});
-
-var User = mongoose.model('User', {
-    email: String,
-    _categories: [
-        { type: String, ref: 'Category' }
-    ],
-    logs: [
-        {type: Schema.Types.ObjectId, ref: 'Log'}
-    ]
-});
-
-var Log = mongoose.model('Log', {
-    _category: { type: String, ref: 'Category' },
-    message: String,
-    attachments: [
-        {name: String, file: Buffer}
-    ],
-    _user: { type: String, ref: 'User' }
-});
-
-var rtnri = new Category({name: "RTnRI"});
+var rtnri = new model.Category({name: "RTnRI"});
 rtnri.save(function (err) {
     if (err) {
         console.log(err.message);
     }
-    var user = new User({email: "sad@dw.ry", _categories: [rtnri.id]})
+    var user = new model.User({email: "sad@dw.ry", _categories: [rtnri.id]})
     user.save(function (err) {
         if (err) {
             console.log(err.message);
@@ -106,14 +77,14 @@ connection.on('ready', function () {
     //servQueueName = 'tw-server-' + Math.random();
     var queue;
 
-        queue = connection.queue(twIncomingQueue, {exclusive: false},
-            function (queue) {
-                // Subscribe to global exchange
-                console.log(' [*] Waiting for messages. To exit press CTRL+C')
-                queue.subscribe(function (msg) {
-                    var envelope = Notificator.Envelope.decode(msg.data);
-                    decomposition(envelope);
-                    console.log(" [x] Message received & processed");
-                });
+    queue = connection.queue(twIncomingQueue, {exclusive: false},
+        function (queue) {
+            // Subscribe to global exchange
+            console.log(' [*] Waiting for messages. To exit press CTRL+C')
+            queue.subscribe(function (msg) {
+                var envelope = Notificator.Envelope.decode(msg.data);
+                decomposition(envelope);
+                console.log(" [x] Message received & processed");
             });
+        });
 });
