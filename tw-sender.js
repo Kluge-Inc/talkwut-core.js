@@ -19,25 +19,15 @@ var builder = ProtoBuf.protoFromFile("talkwut-protocol/notifier/protocol.proto")
 
 // Configuration params
 var
-    amqpHost = 'localhost',
-    twIncomingQueue = 'talkwut-global'
+    amqpHost = '192.168.9.118',
+    twIncomingQueue = 'talkwut-incoming'
 
 // Open amqp connection
 var connection = amqp.createConnection({host: amqpHost});
 
 connection.on('ready', function(){
-
-    // Generate unique queue name for server
-    servQueueName = 'tw-server-' + Math.random();
-
-    // Connect to exchange (create if not present)
-    exchangeGlobal = connection.exchange(twIncomingQueue, {type: 'fanout',
-        autoDelete: false}, function(exchange){
-
-    });
-
     var Notificator = builder.build("talkwut.notifier");
-    var email = new Notificator.Email(['test@example.com'], new Notificator.Notification("Title", "Message body", "http://www.rabbitmq.com/amqp-0-9-1-reference.html"));
+    var email = new Notificator.Envelope(new Notificator.Notification("Title", "Message body", "http://www.rabbitmq.com/amqp-0-9-1-reference.html"), new Notificator.Envelope.Destination(['sd@asdw', '13wd@wdsad'],['ololo']));
 
-    exchangeGlobal.publish('', email.toBuffer());
+    connection.publish(twIncomingQueue, email.toBuffer());
 });

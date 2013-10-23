@@ -42,9 +42,8 @@ var Notificator = builder.build("talkwut.notifier");
 
 // Configuration params
 var
-    amqpHost = 'localhost',
-    twIncomingQueue = 'talkwut-global',
-    twUserRegistrationQueue = 'talkwut-register'
+    amqpHost = '192.168.9.118',
+    twIncomingQueue = 'talkwut-incoming'
 
 mongoose.connect('mongodb://195.211.101.35/talkwut');
 var Schema = mongoose.Schema;
@@ -80,8 +79,8 @@ rtnri.save(function (err) {
     if (err) {
         console.log(err.message);
     }
-    var user = new User({email:"sad@dw.ry", _categories:[rtnri.id]})
-    user.save(function(err){
+    var user = new User({email: "sad@dw.ry", _categories: [rtnri.id]})
+    user.save(function (err) {
         if (err) {
             console.log(err.message);
         }
@@ -92,34 +91,29 @@ rtnri.save(function (err) {
 // Open amqp connection
 var connection = amqp.createConnection({host: amqpHost});
 
-var decomposition = function (email) {
-
+var decomposition = function (envelope) {
+    envelope.destination.categories.forEach(function (category) {
+        connection.exchange(category, {type: 'fanout',
+            autoDelete: false}, function (exchange) {
+            exchange.publish('', envelope.message.toBuffer());
+        })
+    });
 }
 
 connection.on('ready', function () {
 
     // Generate unique queue name for server
-    servQueueName = 'tw-server-' + Math.random();
+    //servQueueName = 'tw-server-' + Math.random();
     var queue;
 
-    // Connect to exchange (create if not present)
-    exchangeGlobal = connection.exchange(twIncomingQueue, {type: 'fanout',
-        autoDelete: false}, function (exchange) {
-        queue = connection.queue(servQueueName, {exclusive: true},
+        queue = connection.queue(twIncomingQueue, {exclusive: false},
             function (queue) {
                 // Subscribe to global exchange
-                queue.bind(exchange, '');
                 console.log(' [*] Waiting for messages. To exit press CTRL+C')
-                console.log(' [*] Personal queue has been created for this server: %s', servQueueName)
                 queue.subscribe(function (msg) {
-
                     var envelope = Notificator.Envelope.decode(msg.data);
                     decomposition(envelope);
-                    console.log(" [x] Message received: %s", msg.data);
+                    console.log(" [x] Message received & processed");
                 });
             });
-    });
-
-    helloMessage = 'Talkwut node connected: ' + servQueueName;
-    exchangeGlobal.publish('', helloMessage);
 });

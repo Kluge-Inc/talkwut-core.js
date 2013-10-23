@@ -35,7 +35,7 @@ connection.on('ready', function () {
                 // Subscribe to global exchange
                 console.log(' [*] Waiting for messages. To exit press CTRL+C')
                 queue.subscribe(function (msg) {
-                    var registration = TalkwutCoreProtocol.Registration.decode(msg.data);
+                    var registration = TalkwutCoreProtocol.RegistrationRequest.decode(msg.data);
 
                     var userQueue = connection.queue(registration.queue);
                     userQueue.bind(exchange, '');
