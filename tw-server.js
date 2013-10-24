@@ -33,7 +33,7 @@ var
     io = require('socket.io'),
     amqp = require('amqp'),
     ProtoBuf = require("protobufjs"),
-    model = require("./model.js");
+    model = require("./talkwut-model/model.js");
 
 
 var builder = ProtoBuf.protoFromFile("talkwut-protocol/notifier/protocol.proto");
