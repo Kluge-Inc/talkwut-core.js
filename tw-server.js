@@ -43,7 +43,7 @@ var Notificator = builder.build("talkwut.notifier");
 // Configuration params
 var
     amqpHost = '192.168.9.118',
-    twIncomingQueue = 'talkwut-incoming'
+    twIncomingQueue = 'talkwut-incoming';
 
 
 
