@@ -8,7 +8,7 @@
 
 var
     amqp = require('amqp'),
-    model = require('./model.js');
+    model = require('./talkwut-model/model.js');
 
 var ProtoBuf = require("protobufjs");
 
@@ -18,7 +18,7 @@ var TalkwutCoreProtocol = ProtoBuf.protoFromFile("talkwut-protocol/core/registra
 
 // Configuration params
 var
-    amqpHost = '192.168.9.118',
+    amqpHost = 'localhost',
     twIncomingQueue = 'talkwut-global',
     twUserRegistrationQueue = 'talkwut-register'
 
