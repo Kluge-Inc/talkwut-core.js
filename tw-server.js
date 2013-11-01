@@ -33,23 +33,15 @@ var
     io = require('socket.io'),
     amqp = require('amqp'),
     ProtoBuf = require("protobufjs"),
-    model = require("./talkwut-model/model.js");
-
+    model = require("./talkwut-model/model.js"),
+    config = require('config');
 
 var builder = ProtoBuf.protoFromFile("talkwut-protocol/notifier/protocol.proto");
 
 var Notificator = builder.build("talkwut.notifier");
 
-// Configuration params
-var
-    amqpHost = '192.168.9.118',
-    twIncomingQueue = 'talkwut-incoming';
-
-
-
-
 // Open amqp connection
-var connection = amqp.createConnection({host: amqpHost});
+var connection = amqp.createConnection({host: config.amqpHost});
 
 var decomposition = function (envelope) {
     envelope.destination.categories.forEach(function (category) {
@@ -58,6 +50,8 @@ var decomposition = function (envelope) {
             exchange.publish('', envelope.message.toBuffer());
         })
     });
+
+    connection.publish(config.twMailerQueue, envelope);
 }
 
 connection.on('ready', function () {
@@ -66,7 +60,7 @@ connection.on('ready', function () {
     //servQueueName = 'tw-server-' + Math.random();
     var queue;
 
-    queue = connection.queue(twIncomingQueue, {exclusive: false},
+    queue = connection.queue(config.twIncomingQueue, {exclusive: false},
         function (queue) {
             // Subscribe to global exchange
             console.log(' [*] Waiting for messages. To exit press CTRL+C')
