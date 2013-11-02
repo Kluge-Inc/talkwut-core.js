@@ -20,44 +20,37 @@ var TalkwutCoreProtocol = ProtoBuf.protoFromFile("talkwut-protocol/core/registra
 var
     amqpHost = 'localhost',
     twIncomingQueue = 'talkwut-global',
-    twUserRegistrationQueue = 'talkwut-register'
+    twUserRegistrationQueue = 'talkwut-register';
 
 // Open amqp connection
-var connection = amqp.createConnection({host: amqpHost});
+var amqpConnection = amqp.createConnection({host: amqpHost});
 
 
-connection.on('ready', function () {
-    var queue;
+amqpConnection.on('ready', function () {
+    console.log(' [*] Waiting for messages. To exit press CTRL+C');
 
-    exchangeGlobal = connection.exchange(twIncomingQueue, {type: 'fanout',
-        autoDelete: false}, function (exchange) {
-        queue = connection.queue(twUserRegistrationQueue, {durable: true},
-            function (queue) {
-                // Subscribe to global exchange
-                console.log(' [*] Waiting for messages. To exit press CTRL+C')
-                queue.subscribe(function (msg) {
-                    var registration = TalkwutCoreProtocol.RegistrationRequest.decode(msg.data);
+    responseExchange = amqpConnection.exchange('', {type: 'fanout', autoDelete: false});
 
+    regQueue = amqpConnection.queue(twUserRegistrationQueue, {durable: true});  
+    regQueue.subscribe(function (msg) {
 
-                    var userQueue = connection.queue(registration.queue);
-                    userQueue.bind(exchange, '');
+        var registration = TalkwutCoreProtocol.RegistrationRequest.decode(msg.data);
+        console.log(" [r] Request received: %s on personal queue %s", registration.user, registration.queue)
 
-                    try {
-                        model.User.findOne({ 'name': registration.user}).
-                            populate('_categories').exec(function (err, user) {
-                                if (err) console.log(err);
-                                user._categories.forEach(function (category) {
-                                    connection.exchange(category.name, {type: 'fanout',
-                                        autoDelete: false}, function (categoryExchange) {
-                                        userQueue.bind(categoryExchange, '');
-                                        console.log(" [x] Category binded: %s for %s", category.name, registration.user);
-                                    });
-                                });
-                            });
-                    } catch (e) {
-                        console.log(e.message);
-                    }
+        // Fetch user categories from Mongo and bind received queue
+        model.User.findOne({ 'name': registration.user}).
+            populate('_categories').exec(function (err, user) {
+                if (err) console.log(err);
+                user._categories.forEach(function (category) {
+                    bindout(registration.user, category.name, registration.queue);
                 });
-            });
+        });
     });
 });
+
+function bindout(userName, userCategory, userQueue) {
+    queue = amqpConnection.queue(userQueue).bind(userCategory, '');
+    console.log(" [r] Category binded: %s for %s, personal queue %s", userCategory, userName, userQueue);
+    response = 'You have been subscribed to ' + userCategory;
+    responseExchange.publish(userQueue, response);
+};
